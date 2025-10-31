@@ -2,13 +2,12 @@
  * Category related models
  */
 
-import { Product } from "./product.model";
+import { Product } from './product.model';
 
 export interface Category {
   id: string;
   name: string;
   description: string;
-  
 }
 
 export interface CategoryDetail extends Category {
