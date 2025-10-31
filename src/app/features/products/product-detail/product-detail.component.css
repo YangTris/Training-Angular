@@ -1,0 +1,104 @@
+/* Main Image Container */
+.main-image-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Thumbnail Gallery */
+.thumbnail-gallery {
+  margin-top: 1rem;
+}
+
+.thumbnail-image {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.thumbnail-image:hover {
+  transform: scale(1.05);
+  border-color: #0d6efd;
+}
+
+.thumbnail-image.active {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+/* Product Info Section */
+.product-info {
+  padding: 1rem;
+}
+
+.product-info h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.price-section h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.description-section h5,
+.details-section h5 {
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.description-section p {
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.details-section ul li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.details-section ul li:last-child {
+  border-bottom: none;
+}
+
+/* Action Buttons */
+.action-buttons {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.action-buttons .btn {
+  padding: 0.75rem 2rem;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .product-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .price-section h2 {
+    font-size: 2rem;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-buttons .btn.me-2 {
+    margin-right: 0 !important;
+  }
+}
+
+/* Loading and Error States */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
