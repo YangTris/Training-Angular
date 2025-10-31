@@ -1,0 +1,212 @@
+<div class="container mt-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="display-5">Products</h1>
+      <p class="text-muted">Browse our collection of products</p>
+    </div>
+  </div>
+
+  <!-- Search & Sort -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search products..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+        <button class="btn btn-primary" type="button" (click)="onSearch()">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-6 d-flex justify-content-end align-items-center">
+      <div class="me-3 d-flex align-items-center">
+        <label class="me-2 mb-0 small text-muted">Sort by</label>
+        <select
+          class="form-select form-select-sm"
+          style="width: 170px"
+          [(ngModel)]="sortBy"
+          (ngModelChange)="onSortChange()"
+        >
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+          <option value="createdAt">Newest</option>
+        </select>
+
+        <button
+          class="btn btn-sm btn-outline-secondary ms-2"
+          type="button"
+          (click)="toggleSortDirection()"
+          [class.active]="isDescending"
+          title="Toggle sort order"
+        >
+          <span *ngIf="isDescending">▼ Desc</span>
+          <span *ngIf="!isDescending">▲ Asc</span>
+        </button>
+      </div>
+
+      <p class="text-muted mb-0">
+        Showing {{ products.length }} of {{ totalItems }} products
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading products...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !loading" class="alert alert-danger" role="alert">
+    <strong>Error!</strong> {{ errorMessage }}
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-danger ms-3"
+      (click)="loadProducts()"
+    >
+      Try Again
+    </button>
+  </div>
+
+  <!-- Product Grid -->
+  <div
+    *ngIf="!loading && !errorMessage"
+    class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4"
+  >
+    <div class="col" *ngFor="let product of products">
+      <div class="card h-100 shadow-sm">
+        <!-- Product Image -->
+        <img
+          [src]="product.mainImageUrl"
+          [alt]="product.name"
+          class="card-img-top"
+          style="height: 200px; object-fit: cover"
+          onerror="this.src='https://vyghvmdysxqvocgvytoe.supabase.co/storage/v1/object/public/Training_img/error_img.jpg'"
+        />
+
+        <!-- Product Details -->
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+
+          <!-- Fixed height description with placeholder -->
+          <p class="card-text text-muted small product-description">
+            <span *ngIf="product.description">{{ product.description }}</span>
+            <span *ngIf="!product.description" class="fst-italic opacity-50">
+              No description available
+            </span>
+          </p>
+
+          <!-- Actions always at bottom -->
+          <div
+            class="d-flex justify-content-between align-items-center product-actions"
+          >
+            <span class="h5 mb-0 text-primary"
+              >${{ product.price | number : "1.2-2" }}</span
+            >
+            <button
+              class="btn btn-sm btn-outline-primary"
+              routerLink="/products/{{ product.id }}"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !errorMessage && products.length === 0"
+    class="text-center my-5"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="64"
+      height="64"
+      fill="currentColor"
+      class="bi bi-inbox text-muted mb-3"
+      viewBox="0 0 16 16"
+    >
+      <path
+        d="M4.98 4a.5.5 0 0 0-.39.188L1.54 8H6a.5.5 0 0 1 .5.5 1.5 1.5 0 1 0 3 0A.5.5 0 0 1 10 8h4.46l-3.05-3.812A.5.5 0 0 0 11.02 4H4.98zm9.954 5H10.45a2.5 2.5 0 0 1-4.9 0H1.066l.32 2.562a.5.5 0 0 0 .497.438h12.234a.5.5 0 0 0 .496-.438L14.933 9zM3.809 3.563A1.5 1.5 0 0 1 4.981 3h6.038a1.5 1.5 0 0 1 1.172.563l3.7 4.625a.5.5 0 0 1 .105.374l-.39 3.124A1.5 1.5 0 0 1 14.117 13H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .106-.374l3.7-4.625z"
+      />
+    </svg>
+    <h3>No Products Found</h3>
+    <p class="text-muted">Try adjusting your search terms</p>
+  </div>
+
+  <!-- Pagination -->
+  <nav
+    *ngIf="!loading && totalPages > 1"
+    aria-label="Product pagination"
+    class="mt-4"
+  >
+    <ul class="pagination justify-content-center">
+      <!-- Previous Button -->
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button
+          class="page-link"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+      </li>
+
+      <!-- First Page -->
+      <li class="page-item" *ngIf="getPageNumbers()[0] > 1">
+        <button class="page-link" (click)="goToPage(1)">1</button>
+      </li>
+      <li class="page-item disabled" *ngIf="getPageNumbers()[0] > 2">
+        <span class="page-link">...</span>
+      </li>
+
+      <!-- Page Numbers -->
+      <li
+        class="page-item"
+        *ngFor="let page of getPageNumbers()"
+        [class.active]="page === currentPage"
+      >
+        <button class="page-link" (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </li>
+
+      <!-- Last Page -->
+      <li
+        class="page-item disabled"
+        *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1"
+      >
+        <span class="page-link">...</span>
+      </li>
+      <li
+        class="page-item"
+        *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages"
+      >
+        <button class="page-link" (click)="goToPage(totalPages)">
+          {{ totalPages }}
+        </button>
+      </li>
+
+      <!-- Next Button -->
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button
+          class="page-link"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
