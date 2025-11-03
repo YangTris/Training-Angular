@@ -14,7 +14,7 @@ export interface Order {
 
 export interface OrderDetail extends Order {
   shippingAddress: string;
-  items?: OrderItem[];
+  orderItems?: OrderItem[];
 }
 
 export interface OrderItem {
@@ -23,7 +23,7 @@ export interface OrderItem {
   productName: string;
   quantity: number;
   unitPrice: number;
-  totalPrice: number;
+  subtotal: number;
 }
 
 export interface CreateOrderRequest {

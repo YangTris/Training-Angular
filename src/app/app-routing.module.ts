@@ -5,6 +5,9 @@ import { ProductDetailComponent } from './features/products/product-detail/produ
 import { LoginComponent } from './features/auth/login/login.component';
 import { AdminComponent } from './features/admin/admin.component';
 import { RegisterComponent } from './features/auth/register/register.component';
+import { OrderListComponent } from './features/orders/order-list/order-list.component';
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
+import { CheckoutComponent } from './features/cart/checkout/checkout.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
@@ -16,6 +19,9 @@ const routes: Routes = [
     component: ProductDetailComponent,
   },
   { path: 'register', component: RegisterComponent },
+  { path: 'checkout', component: CheckoutComponent },
+  { path: 'orders', component: OrderListComponent },
+  { path: 'orders/:id', component: OrderDetailComponent },
   { path: '**', redirectTo: '/login' },
 ];
 
