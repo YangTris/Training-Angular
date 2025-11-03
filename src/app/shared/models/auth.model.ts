@@ -2,7 +2,7 @@
  * Authentication related models
  */
 
-import { Order } from "./order.model";
+import { Order } from './order.model';
 
 export interface LoginRequest {
   email: string;
@@ -14,6 +14,7 @@ export interface LoginResponse {
   expiresAt: string;
   userId: string;
   email: string;
+  roles?: string[]; // Roles will be decoded from JWT token
 }
 
 export interface RegisterRequest {

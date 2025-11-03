@@ -1,0 +1,38 @@
+.footer {
+  margin-top: auto;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+}
+
+.footer h5,
+.footer h6 {
+  color: #fff;
+}
+
+.social-links a {
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+  color: #667eea !important;
+}
+
+.hover-link {
+  transition: color 0.3s ease;
+}
+
+.hover-link:hover {
+  color: #667eea !important;
+}
+
+@media (max-width: 768px) {
+  .footer .col-md-4,
+  .footer .col-md-2,
+  .footer .col-md-3 {
+    text-align: center;
+  }
+
+  .footer .social-links {
+    justify-content: center;
+  }
+}
