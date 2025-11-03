@@ -9,7 +9,7 @@ import { PaymentMethod } from 'src/app/shared/models/order.model';
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css']
+  styleUrls: ['./checkout.component.css'],
 })
 export class CheckoutComponent implements OnInit {
   checkoutForm!: FormGroup;
@@ -17,13 +17,26 @@ export class CheckoutComponent implements OnInit {
   isLoading = false;
   isProcessing = false;
   errorMessage = '';
-  
+  timeoutIds: number[] = [];
+
   // Payment method options
   paymentMethods = [
-    { value: PaymentMethod.CashOnDelivery, label: 'Cash on Delivery', icon: 'bi-cash-coin' },
-    { value: PaymentMethod.CreditCard, label: 'Credit Card', icon: 'bi-credit-card' },
+    {
+      value: PaymentMethod.CashOnDelivery,
+      label: 'Cash on Delivery',
+      icon: 'bi-cash-coin',
+    },
+    {
+      value: PaymentMethod.CreditCard,
+      label: 'Credit Card',
+      icon: 'bi-credit-card',
+    },
     { value: PaymentMethod.PayPal, label: 'PayPal', icon: 'bi-paypal' },
-    { value: PaymentMethod.BankTransfer, label: 'Bank Transfer', icon: 'bi-bank' }
+    {
+      value: PaymentMethod.BankTransfer,
+      label: 'Bank Transfer',
+      icon: 'bi-bank',
+    },
   ];
 
   constructor(
@@ -38,10 +51,15 @@ export class CheckoutComponent implements OnInit {
     this.loadCart();
   }
 
+  ngOnDestroy(): void {
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
+  }
+
   initializeForm(): void {
     this.checkoutForm = this.fb.group({
       shippingAddress: ['', [Validators.required, Validators.minLength(10)]],
-      paymentMethod: [PaymentMethod.CashOnDelivery, Validators.required]
+      paymentMethod: [PaymentMethod.CashOnDelivery, Validators.required],
     });
   }
 
@@ -49,16 +67,18 @@ export class CheckoutComponent implements OnInit {
     this.isLoading = true;
     this.cartService.getCart().subscribe({
       next: () => {
-        this.cartService.cart$.subscribe(cart => {
+        this.cartService.cart$.subscribe((cart) => {
           this.cart = cart;
           this.isLoading = false;
-          
+
           // Redirect if cart is empty
           if (!cart || cart.items.length === 0) {
-            this.errorMessage = 'Your cart is empty. Please add items before checkout.';
-            setTimeout(() => {
+            this.errorMessage =
+              'Your cart is empty. Please add items before checkout.';
+            const timeoutId = window.setTimeout(() => {
               this.router.navigate(['/products']);
             }, 2000);
+            this.timeoutIds.push(timeoutId);
           }
         });
       },
@@ -66,7 +86,7 @@ export class CheckoutComponent implements OnInit {
         console.error('Error loading cart:', err);
         this.isLoading = false;
         this.errorMessage = 'Failed to load cart. Please try again.';
-      }
+      },
     });
   }
 
@@ -86,7 +106,7 @@ export class CheckoutComponent implements OnInit {
 
     const orderRequest = {
       shippingAddress: this.checkoutForm.value.shippingAddress,
-      paymentMethod: this.checkoutForm.value.paymentMethod
+      paymentMethod: this.checkoutForm.value.paymentMethod,
     };
 
     this.orderService.createOrder(orderRequest).subscribe({
@@ -98,29 +118,30 @@ export class CheckoutComponent implements OnInit {
       error: (err) => {
         this.isProcessing = false;
         console.error('Error creating order:', err);
-        
+
         if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
-          setTimeout(() => {
+          const timeoutId = window.setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
+          this.timeoutIds.push(timeoutId);
         } else {
-          this.errorMessage = err.error?.message || 'Failed to place order. Please try again.';
+          this.errorMessage =
+            err.error?.message || 'Failed to place order. Please try again.';
         }
-      }
+      },
     });
   }
 
   getPaymentMethodLabel(value: PaymentMethod): string {
-    const method = this.paymentMethods.find(m => m.value === value);
+    const method = this.paymentMethods.find((m) => m.value === value);
     return method ? method.label : 'Unknown';
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.keys(formGroup.controls).forEach(key => {
+    Object.keys(formGroup.controls).forEach((key) => {
       const control = formGroup.get(key);
       control?.markAsTouched();
     });
   }
 }
-
