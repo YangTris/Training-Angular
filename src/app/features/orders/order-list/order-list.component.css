@@ -1,0 +1,29 @@
+.order-card {
+  border: 1px solid #dee2e6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pagination .page-link {
+  color: #667eea;
+}
+
+.pagination .page-item.active .page-link {
+  color: white;
+}
+
+.btn-outline-primary {
+  color: #667eea;
+  border-color: #667eea;
+}
+
+.btn-outline-primary:hover {
+  background-color: #667eea;
+  border-color: #667eea;
+  color: white;
+}

@@ -13,8 +13,9 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { AdminComponent } from './features/admin/admin.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
-import { CartViewComponent } from './features/cart/cart-view/cart-view.component';
-import { CheckoutComponent } from './features/checkout/checkout/checkout.component';
+import { CheckoutComponent } from './features/cart/checkout/checkout.component';
+import { OrderListComponent } from './features/orders/order-list/order-list.component';
+import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
 
 @NgModule({
   declarations: [
@@ -26,8 +27,9 @@ import { CheckoutComponent } from './features/checkout/checkout/checkout.compone
     AdminComponent,
     HeaderComponent,
     FooterComponent,
-    CartViewComponent,
     CheckoutComponent,
+    OrderListComponent,
+    OrderDetailComponent,
   ],
   imports: [
     BrowserModule,

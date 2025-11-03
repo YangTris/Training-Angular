@@ -1,0 +1,84 @@
+/* Order Item Styling */
+.order-item {
+  padding: 1rem 0;
+}
+
+.order-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Card Headers */
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Timeline Styling */
+.timeline {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -2rem;
+  top: 0.5rem;
+  bottom: -1.5rem;
+  width: 2px;
+  background: #dee2e6;
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -2.5rem;
+  top: 0;
+  width: 1rem;
+  height: 1rem;
+  background: #dee2e6;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-item.active .timeline-marker {
+  background: #667eea;
+  box-shadow: 0 0 0 2px #667eea;
+}
+
+.timeline-item.active::before {
+  background: #667eea;
+}
+
+.timeline-content strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-item.active .timeline-content strong {
+  color: #667eea;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .order-item .row > div {
+    margin-bottom: 0.5rem;
+  }
+
+  .order-item .col-md-2,
+  .order-item .col-md-6 {
+    text-align: left !important;
+  }
+}

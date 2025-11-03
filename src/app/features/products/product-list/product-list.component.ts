@@ -31,6 +31,8 @@ export class ProductListComponent implements OnInit {
   sortBy = 'createdAt'; // Use lowercase to match HTML options
   isDescending = true;
 
+  timeoutIds: number[] = [];
+
   // Cart state
   addingToCart: { [productId: string]: boolean } = {};
   successMessage = '';
@@ -48,6 +50,11 @@ export class ProductListComponent implements OnInit {
    */
   ngOnInit(): void {
     this.loadProducts();
+  }
+
+  ngOnDestroy(): void {
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
   }
 
   /**
@@ -194,7 +201,11 @@ export class ProductListComponent implements OnInit {
           this.successMessage = `${product.name} added to cart!`;
 
           // Clear success message after 3 seconds
-          setTimeout(() => (this.successMessage = ''), 3000);
+          const timeoutId = window.setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+
+          this.timeoutIds.push(timeoutId);
         },
         error: (error) => {
           this.addingToCart[product.id] = false;
