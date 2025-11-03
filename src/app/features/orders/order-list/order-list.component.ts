@@ -22,6 +22,7 @@ export class OrderListComponent implements OnInit {
   pageSize = 5;
   totalPages = 0;
   totalItems = 0;
+  timeoutIds: number[] = [];
 
   // Enums for template
   OrderStatus = OrderStatus;
@@ -31,6 +32,11 @@ export class OrderListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
+  }
+
+  ngOnDestroy(): void {
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
   }
 
   loadOrders(page: number = 1): void {
@@ -58,9 +64,10 @@ export class OrderListComponent implements OnInit {
 
           if (err.status === 401) {
             this.errorMessage = 'Session expired. Please login again.';
-            setTimeout(() => {
+            const timeoutId = window.setTimeout(() => {
               this.router.navigate(['/login']);
             }, 2000);
+            this.timeoutIds.push(timeoutId);
           } else {
             this.errorMessage = 'Failed to load orders. Please try again.';
           }

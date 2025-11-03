@@ -16,6 +16,7 @@ export class OrderDetailComponent implements OnInit {
   order: OrderDetail | null = null;
   isLoading = false;
   errorMessage = '';
+  timeoutIds: number[] = [];
 
   // Enums for template
   OrderStatus = OrderStatus;
@@ -34,6 +35,11 @@ export class OrderDetailComponent implements OnInit {
     } else {
       this.errorMessage = 'Order ID not found';
     }
+  }
+
+  ngOnDestroy(): void {
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
   }
 
   loadOrderDetail(orderId: string): void {
@@ -57,9 +63,10 @@ export class OrderDetailComponent implements OnInit {
 
         if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
-          setTimeout(() => {
+          const timeoutId = window.setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
+          this.timeoutIds.push(timeoutId);
         } else if (err.status === 404) {
           this.errorMessage = 'Order not found.';
         } else {
