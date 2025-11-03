@@ -30,10 +30,62 @@ export class AuthService {
 
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
       tap((response) => {
-        // Update auth store on successful login
-        this.authStore.setAuth(response.token, response.userId, response.email);
+        // Decode JWT token to extract roles
+        const roles = this.decodeTokenRoles(response.token);
+
+        // Update auth store on successful login with roles
+        this.authStore.setAuth(
+          response.token,
+          response.userId,
+          response.email,
+          roles
+        );
       })
     );
+  }
+
+  /**
+   * Decode JWT token and extract roles
+   * JWT token format: header.payload.signature
+   */
+  private decodeTokenRoles(token: string): string[] {
+    try {
+      // Split token and get payload (middle part)
+      const payload = token.split('.')[1];
+
+      // Decode base64 payload
+      const decodedPayload = JSON.parse(atob(payload));
+
+      // JWT role claim can be under different keys depending on backend implementation
+      // Common keys: 'role', 'roles', 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+      const roleClaimKey =
+        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+
+      let roles: string[] = [];
+
+      if (decodedPayload[roleClaimKey]) {
+        // Handle both single role (string) and multiple roles (array)
+        if (Array.isArray(decodedPayload[roleClaimKey])) {
+          roles = decodedPayload[roleClaimKey];
+        } else {
+          roles = [decodedPayload[roleClaimKey]];
+        }
+      } else if (decodedPayload['role']) {
+        roles = Array.isArray(decodedPayload['role'])
+          ? decodedPayload['role']
+          : [decodedPayload['role']];
+      } else if (decodedPayload['roles']) {
+        roles = Array.isArray(decodedPayload['roles'])
+          ? decodedPayload['roles']
+          : [decodedPayload['roles']];
+      }
+
+      console.log('Decoded roles from token:', roles);
+      return roles;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return [];
+    }
   }
 
   /**
@@ -68,5 +120,19 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return this.authStore.isAuthenticated();
+  }
+
+  /**
+   * Get user roles
+   */
+  getRoles(): string[] {
+    return this.authStore.getRoles();
+  }
+
+  /**
+   * Check if user has a specific role
+   */
+  hasRole(role: string): boolean {
+    return this.authStore.hasRole(role);
   }
 }

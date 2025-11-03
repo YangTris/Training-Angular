@@ -9,6 +9,7 @@ export interface AuthState {
   token: string | null;
   userId: string | null;
   email: string | null;
+  roles: string[];
 }
 
 /**
@@ -16,14 +17,15 @@ export interface AuthState {
  * Provides centralized authentication state management
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthStore {
   private initialState: AuthState = {
     isAuthenticated: false,
     token: null,
     userId: null,
-    email: null
+    email: null,
+    roles: [],
   };
 
   private authSubject = new BehaviorSubject<AuthState>(this.initialState);
@@ -37,12 +39,18 @@ export class AuthStore {
   /**
    * Set authentication state after login
    */
-  setAuth(token: string, userId: string, email: string): void {
+  setAuth(
+    token: string,
+    userId: string,
+    email: string,
+    roles: string[] = []
+  ): void {
     const authState: AuthState = {
       isAuthenticated: true,
       token,
       userId,
-      email
+      email,
+      roles,
     };
     this.authSubject.next(authState);
     this.saveToStorage(authState);
@@ -78,19 +86,36 @@ export class AuthStore {
   }
 
   /**
+   * Get user roles
+   */
+  getRoles(): string[] {
+    return this.authSubject.value.roles;
+  }
+
+  /**
+   * Check if user has a specific role
+   */
+  hasRole(role: string): boolean {
+    return this.authSubject.value.roles.includes(role);
+  }
+
+  /**
    * Load auth state from sessionStorage
    */
   private loadFromStorage(): void {
     const token = sessionStorage.getItem('token');
     const userId = sessionStorage.getItem('userId');
     const email = sessionStorage.getItem('email');
+    const rolesJson = sessionStorage.getItem('roles');
+    const roles = rolesJson ? JSON.parse(rolesJson) : [];
 
     if (token && userId && email) {
       this.authSubject.next({
         isAuthenticated: true,
         token,
         userId,
-        email
+        email,
+        roles,
       });
     }
   }
@@ -103,6 +128,7 @@ export class AuthStore {
       sessionStorage.setItem('token', authState.token);
       sessionStorage.setItem('userId', authState.userId);
       sessionStorage.setItem('email', authState.email);
+      sessionStorage.setItem('roles', JSON.stringify(authState.roles));
     }
   }
 
@@ -113,5 +139,6 @@ export class AuthStore {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('email');
+    sessionStorage.removeItem('roles');
   }
 }

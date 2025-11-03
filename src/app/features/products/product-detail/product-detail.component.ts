@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from 'src/app/core/services/product.service';
+import { CartService } from 'src/app/core/services/cart.service';
+import { AuthStore } from 'src/app/store/auth.store';
 import { ProductDetail } from 'src/app/shared/models/product.model';
 
 @Component({
@@ -13,9 +15,14 @@ export class ProductDetailComponent implements OnInit {
   selectedImage: string = '';
   isLoading = false;
   errorMessage = '';
+  quantity = 1;
+  isAddingToCart = false;
+  successMessage = '';
 
   constructor(
     private productService: ProductService,
+    private cartService: CartService,
+    private authStore: AuthStore,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -85,11 +92,70 @@ export class ProductDetailComponent implements OnInit {
   }
 
   /**
-   * Add product to cart (placeholder for future implementation)
+   * Increase quantity
+   */
+  increaseQuantity(): void {
+    if (this.quantity < 99) {
+      this.quantity++;
+    }
+  }
+
+  /**
+   * Decrease quantity
+   */
+  decreaseQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  }
+
+  /**
+   * Add product to cart
    */
   addToCart(): void {
-    console.log('Add to cart clicked for product:', this.product?.id);
-    // TODO: Implement cart functionality
-    alert('Cart functionality will be implemented soon!');
+    if (!this.product) return;
+
+    // Check if user is logged in
+    const auth = this.authStore.getAuthValue();
+    if (!auth.isAuthenticated) {
+      alert('Please login to add items to cart');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.isAddingToCart = true;
+    this.successMessage = '';
+
+    this.cartService
+      .addToCart({
+        productId: this.product.id,
+        quantity: this.quantity,
+      })
+      .subscribe({
+        next: () => {
+          this.isAddingToCart = false;
+          this.successMessage = `${this.product!.name} added to cart!`;
+
+          // Reset quantity
+          this.quantity = 1;
+
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        },
+        error: (err) => {
+          this.isAddingToCart = false;
+
+          if (err.status === 401) {
+            alert('Session expired. Please login again.');
+            this.router.navigate(['/login']);
+          } else {
+            alert('Failed to add item to cart. Please try again.');
+          }
+
+          console.error('Error adding to cart:', err);
+        },
+      });
   }
 }

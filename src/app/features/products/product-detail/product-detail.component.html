@@ -69,6 +69,21 @@
     <!-- Product Information -->
     <div class="col-md-6">
       <div class="product-info">
+        <!-- Success Message -->
+        <div
+          *ngIf="successMessage"
+          class="alert alert-success alert-dismissible fade show"
+          role="alert"
+        >
+          <i class="bi bi-check-circle-fill me-2"></i>
+          {{ successMessage }}
+          <button
+            type="button"
+            class="btn-close"
+            (click)="successMessage = ''"
+          ></button>
+        </div>
+
         <h1 class="mb-3">{{ product.name }}</h1>
 
         <!-- Price -->
@@ -87,29 +102,53 @@
           </p>
         </div>
 
-        <!-- Product Details -->
-        <!-- <div class="details-section mb-4">
-          <h5>Product Details</h5>
-          <ul class="list-unstyled">
-            <li class="mb-2">
-              <strong>Product ID:</strong> <code>{{ product.id }}</code>
-            </li>
-            <li class="mb-2" *ngIf="product.categoryId">
-              <strong>Category ID:</strong> <code>{{ product.categoryId }}</code>
-            </li>
-            <li class="mb-2" *ngIf="product.createdAt">
-              <strong>Created:</strong> {{ product.createdAt | date: 'medium' }}
-            </li>
-            <li class="mb-2" *ngIf="product.updatedAt">
-              <strong>Last Updated:</strong> {{ product.updatedAt | date: 'medium' }}
-            </li>
-          </ul>
-        </div> -->
+        <!-- Quantity Selector -->
+        <div class="quantity-section mb-4">
+          <h6>Quantity</h6>
+          <div class="d-flex align-items-center">
+            <div class="btn-group" role="group">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="decreaseQuantity()"
+                [disabled]="quantity <= 1 || isAddingToCart"
+              >
+                <i class="bi bi-dash"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                disabled
+                style="min-width: 60px"
+              >
+                {{ quantity }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="increaseQuantity()"
+                [disabled]="quantity >= 99 || isAddingToCart"
+              >
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <button class="btn btn-primary btn-lg me-2" (click)="addToCart()">
-            <i class="bi bi-cart-plus me-2"></i> Add to Cart
+          <button
+            class="btn btn-primary btn-lg me-2"
+            (click)="addToCart()"
+            [disabled]="isAddingToCart"
+          >
+            <span *ngIf="!isAddingToCart">
+              <i class="bi bi-cart-plus me-2"></i> Add to Cart
+            </span>
+            <span *ngIf="isAddingToCart">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Adding...
+            </span>
           </button>
           <button class="btn btn-outline-secondary btn-lg" (click)="goBack()">
             <i class="bi bi-arrow-left me-2"></i> Continue Shopping
