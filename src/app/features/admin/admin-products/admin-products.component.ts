@@ -34,6 +34,11 @@ export class AdminProductsComponent implements OnInit {
   selectedProduct: ProductDetail | null = null;
   productForm: FormGroup;
 
+  // Image upload
+  selectedImages: File[] = [];
+  imagePreviewUrls: string[] = [];
+  mainImageIndex: number = 0;
+
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
@@ -104,6 +109,9 @@ export class AdminProductsComponent implements OnInit {
   openProductModal(product?: ProductDetail): void {
     this.selectedProduct = product || null;
     this.clearMessages();
+    this.selectedImages = [];
+    this.imagePreviewUrls = [];
+    this.mainImageIndex = 0;
 
     if (product) {
       this.productForm.patchValue({
@@ -123,10 +131,86 @@ export class AdminProductsComponent implements OnInit {
     this.showProductModal = false;
     this.selectedProduct = null;
     this.productForm.reset();
+    this.selectedImages = [];
+    this.imagePreviewUrls = [];
+    this.mainImageIndex = 0;
+  }
+
+  /**
+   * Handle image file selection
+   */
+  onImageSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    this.selectedImages = Array.from(input.files);
+    this.imagePreviewUrls = [];
+
+    // Validate images
+    const validImages: File[] = [];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+    ];
+
+    for (const file of this.selectedImages) {
+      if (!allowedTypes.includes(file.type)) {
+        this.errorMessage = `Invalid file type: ${file.name}. Allowed: JPG, PNG, GIF, WEBP`;
+        continue;
+      }
+      if (file.size > maxSize) {
+        this.errorMessage = `File too large: ${file.name}. Max size: 5MB`;
+        continue;
+      }
+      validImages.push(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imagePreviewUrls.push(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    this.selectedImages = validImages;
+
+    if (validImages.length === 0) {
+      input.value = '';
+    }
+  }
+
+  /**
+   * Remove selected image
+   */
+  removeImage(index: number): void {
+    this.selectedImages.splice(index, 1);
+    this.imagePreviewUrls.splice(index, 1);
+
+    // Adjust main image index if needed
+    if (this.mainImageIndex >= this.selectedImages.length) {
+      this.mainImageIndex = Math.max(0, this.selectedImages.length - 1);
+    }
+  }
+
+  /**
+   * Set main image
+   */
+  setMainImage(index: number): void {
+    this.mainImageIndex = index;
   }
 
   saveProduct(): void {
     if (this.productForm.invalid) {
+      return;
+    }
+
+    // Validate images for new products
+    if (!this.selectedProduct && this.selectedImages.length === 0) {
+      this.errorMessage = 'At least one product image is required';
       return;
     }
 
@@ -158,15 +242,20 @@ export class AdminProductsComponent implements OnInit {
           },
         });
     } else {
-      // Create new product
-      const createRequest: CreateProductRequest = {
-        name: formData.name,
-        description: formData.description,
-        price: formData.price,
-        categoryId: formData.categoryId,
-      };
+      // Create new product with images using FormData
+      const formDataPayload = new FormData();
+      formDataPayload.append('name', formData.name);
+      formDataPayload.append('description', formData.description || '');
+      formDataPayload.append('price', formData.price.toString());
+      formDataPayload.append('categoryId', formData.categoryId);
+      formDataPayload.append('mainImageIndex', this.mainImageIndex.toString());
 
-      this.productService.createProduct(createRequest).subscribe({
+      // Add all image files
+      this.selectedImages.forEach((file) => {
+        formDataPayload.append('images', file);
+      });
+
+      this.productService.createProductWithImages(formDataPayload).subscribe({
         next: () => {
           this.successMessage = 'Product created successfully!';
           this.closeProductModal();
@@ -175,6 +264,7 @@ export class AdminProductsComponent implements OnInit {
           setTimeout(() => (this.successMessage = ''), 3000);
         },
         error: (error: any) => {
+          console.error('Error creating product:', error);
           this.errorMessage =
             error.error?.message || 'Failed to create product.';
           this.isLoading = false;
