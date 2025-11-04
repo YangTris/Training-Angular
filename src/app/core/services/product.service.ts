@@ -56,6 +56,13 @@ export class ProductService {
     return this.http.post<ProductDetail>(this.apiUrl, product);
   }
 
+  /**
+   * Create product with images (multipart/form-data)
+   */
+  createProductWithImages(formData: FormData): Observable<ProductDetail> {
+    return this.http.post<ProductDetail>(this.apiUrl, formData);
+  }
+
   updateProduct(
     id: string,
     updateProduct: UpdateProductRequest

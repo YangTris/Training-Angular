@@ -1,1 +1,175 @@
-<p>register works!</p>
+<div class="register-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <!-- Register Card -->
+        <div class="card shadow-lg border-0 mt-5">
+          <div class="card-body p-5">
+            <!-- Logo/Title -->
+            <div class="text-center mb-4">
+              <h2 class="fw-bold text-primary">Create Account</h2>
+              <p class="text-muted">Sign up to get started</p>
+            </div>
+
+            <!-- Success Alert -->
+            <div
+              *ngIf="successMessage"
+              class="alert alert-success alert-dismissible fade show"
+              role="alert"
+            >
+              <i class="bi bi-check-circle-fill me-2"></i>
+              {{ successMessage }}
+            </div>
+
+            <!-- Error Alert -->
+            <div
+              *ngIf="errorMessage"
+              class="alert alert-danger alert-dismissible fade show"
+              role="alert"
+            >
+              <i class="bi bi-exclamation-circle-fill me-2"></i>
+              {{ errorMessage }}
+              <button
+                type="button"
+                class="btn-close"
+                (click)="errorMessage = ''"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <!-- Register Form -->
+            <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+              <!-- Full Name Input -->
+              <div class="mb-3">
+                <label for="fullName" class="form-label">Full Name</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-person"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Enter your full name"
+                    [(ngModel)]="fullName"
+                    (input)="clearMessages()"
+                    required
+                    minlength="3"
+                    [disabled]="isLoading"
+                  />
+                </div>
+                <small class="text-muted">Minimum 3 characters</small>
+              </div>
+
+              <!-- Email Input -->
+              <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    [(ngModel)]="email"
+                    (input)="clearMessages()"
+                    required
+                    email
+                    [disabled]="isLoading"
+                  />
+                </div>
+              </div>
+
+              <!-- Password Input -->
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    [(ngModel)]="password"
+                    (input)="clearMessages()"
+                    required
+                    minlength="6"
+                    [disabled]="isLoading"
+                  />
+                </div>
+                <small class="text-muted">
+                  At least 6 characters with uppercase, lowercase, and number
+                </small>
+              </div>
+
+              <!-- Confirm Password Input -->
+              <div class="mb-4">
+                <label for="confirmPassword" class="form-label"
+                  >Confirm Password</label
+                >
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-lock-fill"></i>
+                  </span>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Confirm your password"
+                    [(ngModel)]="confirmPassword"
+                    (input)="clearMessages()"
+                    required
+                    minlength="6"
+                    [disabled]="isLoading"
+                  />
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  [disabled]="isLoading || !registerForm.form.valid"
+                >
+                  <span *ngIf="!isLoading">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Create Account
+                  </span>
+                  <span *ngIf="isLoading">
+                    <span
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Creating account...
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            <!-- Footer Links -->
+            <div class="text-center mt-4">
+              <p class="text-muted small mb-0">
+                Already have an account?
+                <a
+                  routerLink="/login"
+                  class="text-primary fw-bold text-decoration-none"
+                  >Sign in</a
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

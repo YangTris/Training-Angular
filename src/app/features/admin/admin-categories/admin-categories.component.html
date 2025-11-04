@@ -1,1 +1,249 @@
-<p>admin-categories works!</p>
+<div class="admin-categories-container">
+  <!-- Header -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">Categories Management</h3>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <i class="bi bi-plus-circle"></i> Add Category
+      </button>
+    </div>
+
+    <div class="card-body">
+      <!-- Success Message -->
+      <div
+        class="alert alert-success alert-dismissible fade show"
+        role="alert"
+        *ngIf="successMessage"
+      >
+        {{ successMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="clearMessages()"
+        ></button>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="clearMessages()"
+        ></button>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div class="text-center py-5" *ngIf="isLoading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading categories...</p>
+      </div>
+
+      <!-- Categories Table -->
+      <div *ngIf="!isLoading && categories.length > 0">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of categories">
+              <td>
+                <strong>{{ category.name }}</strong>
+              </td>
+              <td>
+                {{ category.description || "No description" }}
+              </td>
+              <td class="text-end">
+                <button
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="openEditModal(category)"
+                  title="Edit Category"
+                >
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="openDeleteModal(category)"
+                  title="Delete Category"
+                >
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        class="text-center py-5"
+        *ngIf="!isLoading && categories.length === 0"
+      >
+        <i class="bi bi-folder2-open" style="font-size: 4rem; color: #ccc"></i>
+        <p class="mt-3 text-muted">
+          No categories found. Create your first category!
+        </p>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="bi bi-plus-circle"></i> Add Category
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Create/Edit Modal -->
+  <div
+    class="modal fade show"
+    [class.show]="showCategoryModal"
+    [style.display]="showCategoryModal ? 'block' : 'none'"
+    tabindex="-1"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ isEditMode ? "Edit Category" : "Create New Category" }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeCategoryModal()"
+          ></button>
+        </div>
+        <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()">
+          <div class="modal-body">
+            <!-- Name Field -->
+            <div class="mb-3">
+              <label for="name" class="form-label">
+                Category Name <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                formControlName="name"
+                [class.is-invalid]="
+                  hasError('name', 'required') || hasError('name', 'minlength')
+                "
+                placeholder="Enter category name"
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="hasError('name', 'required')"
+              >
+                Category name is required
+              </div>
+              <div
+                class="invalid-feedback"
+                *ngIf="hasError('name', 'minlength')"
+              >
+                Category name must be at least 3 characters
+              </div>
+            </div>
+
+            <!-- Description Field -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                id="description"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter category description (optional)"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeCategoryModal()"
+              [disabled]="isSaving"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isSaving || categoryForm.invalid"
+            >
+              <span
+                *ngIf="isSaving"
+                class="spinner-border spinner-border-sm me-2"
+              ></span>
+              {{ isSaving ? "Saving..." : isEditMode ? "Update" : "Create" }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    class="modal fade show"
+    [class.show]="showDeleteModal"
+    [style.display]="showDeleteModal ? 'block' : 'none'"
+    tabindex="-1"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeDeleteModal()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the category:</p>
+          <p class="fw-bold text-danger">{{ selectedCategory?.name }}</p>
+          <p class="text-muted small">
+            <i class="bi bi-exclamation-triangle"></i>
+            This action cannot be undone. Products using this category may be
+            affected.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeDeleteModal()"
+            [disabled]="isSaving"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="deleteCategory()"
+            [disabled]="isSaving"
+          >
+            <span
+              *ngIf="isSaving"
+              class="spinner-border spinner-border-sm me-2"
+            ></span>
+            {{ isSaving ? "Deleting..." : "Delete" }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div
+    class="modal-backdrop fade show"
+    *ngIf="showCategoryModal || showDeleteModal"
+    (click)="showCategoryModal ? closeCategoryModal() : closeDeleteModal()"
+  ></div>
+</div>

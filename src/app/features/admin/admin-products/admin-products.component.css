@@ -6,6 +6,31 @@
   border: 1px solid #dee2e6;
 }
 
+/* Image Preview Styles */
+.image-preview-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.image-preview-container img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.image-preview-container .btn-danger {
+  opacity: 0.9;
+}
+
+.image-preview-container .btn-danger:hover {
+  opacity: 1;
+}
+
+.image-preview-container .form-check {
+  opacity: 0.95;
+}
+
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
 }
