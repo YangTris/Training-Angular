@@ -10,12 +10,16 @@ import { ProductListComponent } from './features/products/product-list/product-l
 import { ProductDetailComponent } from './features/products/product-detail/product-detail.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { AdminComponent } from './features/admin/admin.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { CheckoutComponent } from './features/cart/checkout/checkout.component';
 import { OrderListComponent } from './features/orders/order-list/order-list.component';
 import { OrderDetailComponent } from './features/orders/order-detail/order-detail.component';
+import { AdminComponent } from './features/admin/admin.component';
+import { AdminProductsComponent } from './features/admin/admin-products/admin-products.component';
+import { AdminCategoriesComponent } from './features/admin/admin-categories/admin-categories.component';
+import { AdminOrdersComponent } from './features/admin/admin-orders/admin-orders.component';
+import { AdminUsersComponent } from './features/admin/admin-users/admin-users.component';
 
 @NgModule({
   declarations: [
@@ -24,12 +28,16 @@ import { OrderDetailComponent } from './features/orders/order-detail/order-detai
     ProductDetailComponent,
     LoginComponent,
     RegisterComponent,
-    AdminComponent,
     HeaderComponent,
     FooterComponent,
     CheckoutComponent,
     OrderListComponent,
     OrderDetailComponent,
+    AdminComponent,
+    AdminProductsComponent,
+    AdminCategoriesComponent,
+    AdminOrdersComponent,
+    AdminUsersComponent,
   ],
   imports: [
     BrowserModule,
