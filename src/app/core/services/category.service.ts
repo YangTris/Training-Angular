@@ -28,4 +28,31 @@ export class CategoryService {
   getCategoryById(id: string): Observable<Category> {
     return this.http.get<Category>(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Create new category (Admin only)
+   */
+  createCategory(category: {
+    name: string;
+    description?: string;
+  }): Observable<Category> {
+    return this.http.post<Category>(this.apiUrl, category);
+  }
+
+  /**
+   * Update category (Admin only)
+   */
+  updateCategory(
+    id: string,
+    category: { name: string; description?: string }
+  ): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, category);
+  }
+
+  /**
+   * Delete category (Admin only)
+   */
+  deleteCategory(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

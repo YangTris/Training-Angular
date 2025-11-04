@@ -7,13 +7,14 @@ import {
   CreateOrderRequest,
   PaginatedResult,
   PaginationParams,
+  UpdateOrderStatusRequest,
 } from 'src/app/shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:5296/api/order';
+  private apiUrl = 'http://localhost:5296/api/Order';
 
   constructor(private http: HttpClient) {}
 
@@ -38,5 +39,27 @@ export class OrderService {
    */
   getOrderById(orderId: string): Observable<OrderDetail> {
     return this.http.get<OrderDetail>(`${this.apiUrl}/${orderId}`);
+  }
+
+  /**
+   * Get all orders (Admin only)
+   */
+  getAllOrders(params?: PaginationParams): Observable<PaginatedResult<Order>> {
+    return this.http.get<PaginatedResult<Order>>(`${this.apiUrl}/all`, {
+      params: params as any,
+    });
+  }
+
+  /**
+   * Update order status (Admin only)
+   */
+  updateOrderStatus(
+    orderId: string,
+    updateOrder: UpdateOrderStatusRequest
+  ): Observable<void> {
+    return this.http.patch<void>(
+      `${this.apiUrl}/${orderId}/status`,
+      updateOrder
+    );
   }
 }

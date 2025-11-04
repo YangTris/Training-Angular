@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from 'src/app/core/services/order.service';
+import { AuthStore } from 'src/app/store/auth.store';
 import {
   OrderDetail,
   OrderStatus,
@@ -17,6 +18,7 @@ export class OrderDetailComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   timeoutIds: number[] = [];
+  isAdmin = false;
 
   // Enums for template
   OrderStatus = OrderStatus;
@@ -25,10 +27,15 @@ export class OrderDetailComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authStore: AuthStore
   ) {}
 
   ngOnInit(): void {
+    // Check if user is admin
+    const authState = this.authStore.getAuthValue();
+    this.isAdmin = authState.roles?.includes('Admin') ?? false;
+
     const orderId = this.route.snapshot.paramMap.get('id');
     if (orderId) {
       this.loadOrderDetail(orderId);
@@ -141,7 +148,11 @@ export class OrderDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/orders']);
+    if (this.isAdmin) {
+      this.router.navigate(['/admin'], { queryParams: { tab: 'orders' } });
+    } else {
+      this.router.navigate(['/orders']);
+    }
   }
 
   continueShopping(): void {

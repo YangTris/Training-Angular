@@ -1,0 +1,243 @@
+<div class="card border-0 shadow-sm">
+  <!-- Card Header -->
+  <div class="card-header bg-white py-3">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>Order Management</h4>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <span class="text-muted">Total Orders: {{ totalItems }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body">
+    <!-- Success Message -->
+    <div
+      *ngIf="successMessage"
+      class="alert alert-success alert-dismissible fade show"
+    >
+      <i class="bi bi-check-circle me-2"></i>{{ successMessage }}
+      <button
+        type="button"
+        class="btn-close"
+        (click)="successMessage = ''"
+      ></button>
+    </div>
+
+    <!-- Error Message -->
+    <div
+      *ngIf="errorMessage"
+      class="alert alert-danger alert-dismissible fade show"
+    >
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMessage }}
+      <button
+        type="button"
+        class="btn-close"
+        (click)="errorMessage = ''"
+      ></button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-3">Loading orders...</p>
+    </div>
+
+    <!-- Orders Table -->
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Payment Method</th>
+            <th>Items</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders">
+            <td>
+              <span class="font-monospace text-muted small">
+                {{ order.id.substring(0, 8) }}...
+              </span>
+            </td>
+            <td>{{ order.orderDate | date : "short" }}</td>
+            <td class="fw-bold">${{ order.totalAmount | number : "1.2-2" }}</td>
+            <td>
+              <span class="badge" [ngClass]="getStatusBadgeClass(order.status)">
+                {{ getStatusText(order.status) }}
+              </span>
+            </td>
+            <td>{{ getPaymentMethodText(order.paymentMethod) }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ order.itemCount || 0 }} item(s)
+              </span>
+            </td>
+            <td class="text-center">
+              <div class="btn-group btn-group-sm" role="group">
+                <button
+                  class="btn btn-outline-primary"
+                  (click)="viewOrderDetail(order.id)"
+                  title="View Details"
+                >
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button
+                  class="btn btn-outline-warning"
+                  (click)="openStatusModal(order)"
+                  title="Update Status"
+                  [disabled]="
+                    order.status === OrderStatus.Completed ||
+                    order.status === OrderStatus.Cancelled
+                  "
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div *ngIf="orders.length === 0" class="text-center py-5">
+        <i class="bi bi-receipt display-1 text-muted"></i>
+        <p class="text-muted mt-3">No orders found</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="!isLoading && totalPages > 1"
+      class="d-flex justify-content-between align-items-center mt-4"
+    >
+      <div class="text-muted">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} to
+        {{ Math.min(currentPage * pageSize, totalItems) }} of
+        {{ totalItems }} orders
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="previousPage()">Previous</a>
+          </li>
+          <li
+            *ngFor="let page of pages"
+            class="page-item"
+            [class.active]="currentPage === page"
+          >
+            <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" (click)="nextPage()">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Update Status Modal -->
+<div
+  class="modal"
+  [class.show]="showStatusModal"
+  [style.display]="showStatusModal ? 'block' : 'none'"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil me-2"></i>Update Order Status
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeStatusModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="selectedOrder" class="mb-3">
+          <p class="mb-2">
+            <strong>Order ID:</strong>
+            <span class="font-monospace text-muted ms-2">{{
+              selectedOrder.id
+            }}</span>
+          </p>
+          <p class="mb-2">
+            <strong>Current Status:</strong>
+            <span
+              class="badge ms-2"
+              [ngClass]="getStatusBadgeClass(selectedOrder.status)"
+            >
+              {{ getStatusText(selectedOrder.status) }}
+            </span>
+          </p>
+          <p class="mb-0">
+            <strong>Total Amount:</strong>
+            <span class="fw-bold text-success ms-2"
+              >${{ selectedOrder.totalAmount | number : "1.2-2" }}</span
+            >
+          </p>
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+          <label for="orderStatus" class="form-label fw-bold">New Status</label>
+          <select
+            id="orderStatus"
+            class="form-select"
+            [(ngModel)]="selectedStatus"
+          >
+            <option [ngValue]="OrderStatus.Pending">Pending</option>
+            <option [ngValue]="OrderStatus.Processing">Processing</option>
+            <option [ngValue]="OrderStatus.Shipped">Shipped</option>
+            <option [ngValue]="OrderStatus.Completed">Completed</option>
+            <option [ngValue]="OrderStatus.Cancelled">Cancelled</option>
+          </select>
+          <div class="form-text">
+            <i class="bi bi-info-circle me-1"></i>
+            Select the new status for this order
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeStatusModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          (click)="updateStatus()"
+          [disabled]="isLoading"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          <i *ngIf="!isLoading" class="bi bi-check-circle me-2"></i>
+          Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  class="modal-backdrop fade"
+  [class.show]="showStatusModal"
+  *ngIf="showStatusModal"
+></div>

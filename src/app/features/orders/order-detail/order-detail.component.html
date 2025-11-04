@@ -3,7 +3,7 @@
   <div class="mb-3">
     <button class="btn btn-outline-secondary" (click)="goBack()">
       <i class="bi bi-arrow-left me-2"></i>
-      Back to Orders
+      {{ isAdmin ? "Back to Admin Panel" : "Back to Orders" }}
     </button>
   </div>
 

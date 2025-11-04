@@ -1,0 +1,23 @@
+.product-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: block !important;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+}
