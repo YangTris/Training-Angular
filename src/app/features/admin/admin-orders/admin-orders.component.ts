@@ -104,8 +104,8 @@ export class AdminOrdersComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
 
     // Ensure we send the numeric value of the enum
-    const updateRequest = {
-      status: Number(this.selectedStatus),
+    const updateRequest: UpdateOrderStatusRequest = {
+      status: this.selectedStatus
     };
 
     this.orderService

@@ -69,7 +69,12 @@
               <strong>{{ product.name }}</strong>
             </td>
             <td>
-              {{ product.description || "No description" | slice : 0 : 50 }}...
+              {{
+                (product.description || "No description").length > 50
+                  ? (product.description || "No description" | slice : 0 : 50) +
+                    "..."
+                  : product.description || "No description"
+              }}
             </td>
             <td>
               <strong class="text-success">{{

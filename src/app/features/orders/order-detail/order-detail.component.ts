@@ -34,7 +34,7 @@ export class OrderDetailComponent implements OnInit {
   ngOnInit(): void {
     // Check if user is admin
     const authState = this.authStore.getAuthValue();
-    this.isAdmin = authState.roles.includes('Admin');
+    this.isAdmin = authState.roles?.includes('Admin') ?? false;
 
     const orderId = this.route.snapshot.paramMap.get('id');
     if (orderId) {
