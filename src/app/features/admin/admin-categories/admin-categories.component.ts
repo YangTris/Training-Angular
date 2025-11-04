@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../shared/models/category.model';
@@ -8,7 +8,7 @@ import { Category } from '../../../shared/models/category.model';
   templateUrl: './admin-categories.component.html',
   styleUrls: ['./admin-categories.component.css'],
 })
-export class AdminCategoriesComponent implements OnInit {
+export class AdminCategoriesComponent implements OnInit, OnDestroy {
   // Data
   categories: Category[] = [];
   selectedCategory: Category | null = null;
@@ -18,6 +18,7 @@ export class AdminCategoriesComponent implements OnInit {
   isSaving = false;
   showCategoryModal = false;
   showDeleteModal = false;
+  timeoutIds: number[] = [];
 
   // Messages
   errorMessage = '';
@@ -36,6 +37,10 @@ export class AdminCategoriesComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
     });
+  }
+  ngOnDestroy(): void {
+    this.timeoutIds.forEach((id) => clearTimeout(id));
+    this.timeoutIds = [];
   }
 
   ngOnInit(): void {
@@ -222,9 +227,10 @@ export class AdminCategoriesComponent implements OnInit {
    * Clear messages after 3 seconds
    */
   private clearMessagesAfterDelay(): void {
-    setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       this.clearMessages();
     }, 3000);
+    this.timeoutIds.push(timeoutId);
   }
 
   /**

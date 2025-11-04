@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -60,10 +60,7 @@ export class RegisterComponent {
             'Registration successful! Redirecting to login...';
           this.isLoading = false;
 
-          // Redirect to login after 2 seconds
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
+          this.router.navigate(['/login']);
         },
         error: (error) => {
           console.error('Registration error:', error);
