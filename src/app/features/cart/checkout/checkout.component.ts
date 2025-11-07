@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from 'src/app/core/services/cart.service';
@@ -11,7 +11,7 @@ import { PaymentMethod } from 'src/app/shared/models/order.model';
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, OnDestroy {
   checkoutForm!: FormGroup;
   cart: Cart | null = null;
   isLoading = false;
@@ -112,8 +112,19 @@ export class CheckoutComponent implements OnInit {
     this.orderService.createOrder(orderRequest).subscribe({
       next: (order) => {
         this.isProcessing = false;
-        // Navigate to order detail page
-        this.router.navigate(['/orders', order.id]);
+
+        this.cartService.clearCart().subscribe({
+          next: () => {
+            console.log('Cart cleared successfully after order creation');
+          },
+          error(err) {
+            console.error('Error clearing cart after order creation:', err);
+          },
+          complete: () => {
+            console.log('Redirecting to order detail page');
+            this.router.navigate(['/orders', order.id]);
+          },
+        });
       },
       error: (err) => {
         this.isProcessing = false;

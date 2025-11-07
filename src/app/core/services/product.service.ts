@@ -52,10 +52,6 @@ export class ProductService {
     return this.http.get<ProductDetail>(`${this.apiUrl}/${id}`);
   }
 
-  createProduct(product: CreateProductRequest): Observable<ProductDetail> {
-    return this.http.post<ProductDetail>(this.apiUrl, product);
-  }
-
   /**
    * Create product with images (multipart/form-data)
    */

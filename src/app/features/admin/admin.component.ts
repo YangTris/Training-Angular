@@ -3,6 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { AuthStore } from 'src/app/store/auth.store';
 
+const VALID_TABS = ['products', 'categories', 'orders', 'users'] as const;
+type AdminTab = (typeof VALID_TABS)[number];
+
+function isValidTab(tab: string): tab is AdminTab {
+  return VALID_TABS.includes(tab as AdminTab);
+}
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -11,7 +18,7 @@ import { AuthStore } from 'src/app/store/auth.store';
 export class AdminComponent implements OnInit {
   userEmail: string = '';
   roles: string[] = [];
-  activeTab: 'products' | 'categories' | 'orders' | 'users' = 'products';
+  activeTab: AdminTab = 'products';
 
   constructor(
     private authService: AuthService,
@@ -31,22 +38,15 @@ export class AdminComponent implements OnInit {
       return;
     }
 
-    // Check for tab query parameter
     this.route.queryParams.subscribe((params) => {
-      if (params['tab']) {
-        const tab = params['tab'] as
-          | 'products'
-          | 'categories'
-          | 'orders'
-          | 'users';
-        if (['products', 'categories', 'orders', 'users'].includes(tab)) {
-          this.activeTab = tab;
-        }
+      const tabParam = params['tab'];
+      if (isValidTab(tabParam)) {
+        this.activeTab = tabParam;
       }
     });
   }
 
-  switchTab(tab: 'products' | 'categories' | 'orders' | 'users'): void {
+  switchTab(tab: AdminTab): void {
     this.activeTab = tab;
   }
 
